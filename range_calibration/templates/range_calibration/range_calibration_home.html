@@ -1,0 +1,131 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+
+{% block content %}
+
+	<article class="post">
+    
+    <div class="post-content">
+      {% if messages %}
+      <ul class="message-list">
+          {% for message in messages %}
+              <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+          {% endfor %}
+      </ul>
+      <br>
+      {% endif %}
+    </div>
+    <br>
+
+    <header class="post-header">
+      <h1 class="post-title text-center">Ready to start the Boya Range Calibration? </h1>
+    </header>
+
+    <div class="post-content">
+      <div class="mt-10 flex justify-center">
+        <a href="{% url 'range_calibration:range-calibrate' %}">
+          <button class="px-3 py-2 border border-transparent text-base leading-4 rounded text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out">
+            Get started now
+          </button>
+        </a>  
+      </div>
+      <br><br>
+      <hr>
+      <br>
+      {% if user.is_authenticated %}
+      <div>
+        <h2> Click on the link below to view individual reports </h2>
+      	<table class="table-fullwidth text-sm">
+      		<tr>
+      			<th> <p> Unique Index </p> </th>    	
+  	    		<th> <p> Observed Date </p> </th>
+  	    		<th> <p> Staff Number </p> </th>
+  	    		<th> <p> Level Number </p> </th>
+  	    		<th> <p> Observer </p> </th>
+  	    		<th> <p> Report </p></th>
+      		</tr>
+          {% if object_list %}
+        		{% for item in object_list %}
+          		<tr>
+          			<td> <a class="hover:bg-yellow-50" href="{% url 'range_calibration:print-report' item.update_index %}" target="_blank"> {{ item.update_index }} </a> </td>    	
+      	    		<td> {{ item.observation_date }} </td>
+      	    		<td> {{ item.staff_number.staff_number }} </td>
+      	    		<td> {{ item.level_number.level_number }} </td>
+      	    		<td> {{ item.surveyor }} </td>
+      	    		<td> 
+                  <a class="px-1 py-1 border border-transparent text-xs leading-2 rounded text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out" href="{% url 'range_calibration:range-report' item.update_index %}"> 
+                    Report&raquo;
+                  </a> <span>
+                  <a class="ml-2 px-1 py-1 border border-transparent text-xs leading-2 rounded text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out" href="{% url 'range_calibration:delete-report' item.update_index %}"> 
+                    Delete
+                  </a> </span>
+                </td>
+          		</tr>
+            {% endfor %}
+          {% else %}
+          <tr>
+            <td colspan="6">There is currently no range measurements listed. You can start to calibrate the range by clicking the get started now button above.</td>
+          </tr>
+          {% endif %}
+      	</table>
+      </div>
+      {% else %}
+        <p>Please login or signup to view or calibrate the Boya Staff Range.</p>
+        <div class="single-item-container">
+          <button class="mr-4 px-2 py-1 border border-transparent text-sm font-small rounded text-white bg-blue-500 hover:bg-gray-500 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out" onclick="location.href='/accounts/login/'">Log in</button>
+          or 
+          <button class="ml-4 px-2 py-1 border border-transparent text-sm font-small rounded text-white bg-blue-500 hover:bg-gray-500 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out" onclick="location.href='/accounts/signup/'">Sign up</button>
+        </div>
+      {% endif %}
+      <!--Pagination-->
+      <br>
+    {% if is_paginated %}
+      <div class="grid-3">
+      	<!-- <ul class="pagination pg-blue"> -->
+        <div>
+      	{% if page_obj.has_previous %}
+          <!-- <li class="page-item"> -->
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+              <span class="sr-only">Previous</span>
+            </a>
+          <!-- </li> -->
+         {% endif %}
+         </div>
+
+        <div>
+          <!-- <li class="page-item active"> -->
+          <a class="page-link" href="?page={{ page_obj.number }}">Page {{ page_obj.number }}
+              <span class="sr-only">(current)</span>
+            </a>
+          <!-- </li> -->
+        </div>
+
+        <div>
+          {% if page_obj.has_next %}
+          <!-- <li class="page-item"> -->
+             <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+             <span aria-hidden="true">&raquo;</span>
+             <span class="sr-only">Next</span>
+             </a>
+          <!-- </li> -->
+          {% endif %}
+        </div>
+        <!-- </ul> -->
+      
+      </div>
+    {% endif %}
+  </article>
+
+<script type="text/javascript">
+  const lis = [...document.querySelectorAll('.messages li')];
+
+  for (const li of lis) {
+    li.addEventListener('click', function() {
+      this.parentNode.removeChild(this);
+    })
+  }
+</script>
+
+
+{% endblock content %}

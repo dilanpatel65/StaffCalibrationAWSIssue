@@ -1,0 +1,83 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+{% block content %}
+
+<article class="post">
+
+    <div class="post-content">
+    	{% if messages %}
+    	<ul class="message-list">
+    	    {% for message in messages %}
+        	    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    	    {% endfor %}
+    	</ul>
+    	<br>
+    	{% endif %}
+    </div>
+
+
+	<header class="post-header">
+	    <h1 class="post-title"> List of recently calibrated staves</h1>
+	</header>
+
+	<div class="post-content">
+
+		{% if staff_lists %}
+			<table>
+				<colgroup>
+					<col span="1" width="16%">
+					<col span="1" width="8%">
+					<col span="1" width="9%">
+					<col span="1" width="10%">
+					<col span="1" width="10%">
+					<col span="1" width="9%">
+					<col span="1" width="11%">
+					<col span="1" width="27%">
+				</colgroup>
+				<tr>
+					<th>Staff ID</th>
+					<th>Staff Owner</th>
+					<th>Staff Number</th>
+	    			<th>Staff Material</th>
+	    			<th>Correction Factor</th>
+	    			<th>Std. Temp.</th>
+	    			<th>Calibration Date</th>
+					<th>Processed Date</th>
+				</tr>
+				{% for staff in staff_lists %}
+					<tr> 
+						<td>{{ staff.update_index }}</td>
+						<td>{{ staff.staff_number.staff_owner.authority_abbrev }}</td>
+						<td>{{ staff.staff_number.staff_number }}</td>
+						<td>{{ staff.staff_number.staff_type }} </td>
+						<td>{{ staff.correction_factor|floatformat:6 }}</td>
+						<td>{{ staff.correction_factor_temperature|floatformat:0 }}&#8451;</td>
+						<td>{{ staff.calibration_date|date:"d/m/Y" }} </td>
+						<td>
+							<div>
+								{{ staff.processed_date|date:"d/m/Y" }} 
+								<a class="ml-1 px-2 py-1 border border-transparent text-xs rounded-md text-white bg-red-600 hover:bg-red-500 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out float-right" href="{% url 'staff_calibration:user-staff-delete' staff.update_index %}" onclick="return confirmation()"> 
+									Delete
+								</a>
+								<a class="ml-1 px-1 py-1 border border-transparent text-xs rounded-md text-white bg-gray-600 hover:bg-gray-500 focus:outline-none focus:shadow-outline transition duration-150 ease-in-out float-right" href="{% url 'staff_calibration:generate-report' staff.update_index %}" target="_blank">
+									Print pdf
+								</a>
+							</div>
+						</td>
+					</tr>
+					
+				{% endfor %}
+			</table>
+		{% else %}
+			<p> There is currently no staffs listed </p>
+		{% endif %}
+	</div>
+</article>
+
+<script type="text/javascript">
+	function confirmation() {
+      return confirm('Are you sure you want to delete this calibration record?');
+    }
+</script>
+
+{% endblock content %}
